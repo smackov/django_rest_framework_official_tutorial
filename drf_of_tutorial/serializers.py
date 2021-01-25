@@ -29,3 +29,9 @@ class SnippetSerializer(serializers.Serializer):
         instance.save()
         return instance
     
+
+class SnippetSerializer_ModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Snippet
+        fields = ['id', 'title', 'code', 'linenos', 'language', 'style']
+    

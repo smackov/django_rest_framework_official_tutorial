@@ -4,14 +4,14 @@ from django.contrib.auth.models import User
 from snippet.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
-class SnippetSerializer(serializers.Serializer):
+class SnippetSerializer_SimpleSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
     code = serializers.CharField(style={'base_template': 'textarea.html'})
     linenos = serializers.BooleanField(required=False)
     language = serializers.ChoiceField(choices=LANGUAGE_CHOICES, default='python')
     style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
-    owner = serializers.ReadOnlyField(source='snippet.owner.username')
+    owner = serializers.ReadOnlyField(source='owner.username')  # Don't work
 
     def create(self, validated_data):
         """
@@ -32,10 +32,11 @@ class SnippetSerializer(serializers.Serializer):
         return instance
     
 
-class SnippetSerializer_ModelSerializer(serializers.ModelSerializer):
+class SnippetSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Snippet
-        fields = ['id', 'title', 'code', 'linenos', 'language', 'style']
+        fields = ['id', 'owner', 'title', 'code', 'linenos', 'language', 'style']
         
         
 class UserSerializer(serializers.ModelSerializer):

@@ -8,6 +8,7 @@ from rest_framework import permissions
 
 from snippet.models import Snippet
 from snippet.serializers import SnippetSerializer, UserSerializer
+from snippet.permissions import IsOwnerOrReadOnly
 
 
 class SnippetList(APIView):
@@ -33,7 +34,11 @@ class SnippetList(APIView):
 class GenericSnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
     
     
 class SnippetDetail(APIView):
@@ -68,7 +73,8 @@ class SnippetDetail(APIView):
 class GenericSnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
     
     
 class UserList(generics.ListAPIView):
